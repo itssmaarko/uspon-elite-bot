@@ -410,8 +410,8 @@ def main():
                 MessageHandler(filters.PHOTO, collect_final_info),
             ],
         },
-        fallbacks=[CommandHandler("cancel", cancel)],
-        persistent=True,
+        fallbacks=[CommandHandler("start", start), CommandHandler("cancel", cancel)],
+allow_reentry=True,        persistent=True,
         name="registration_conv",
     )
 
