@@ -325,7 +325,7 @@ async def collect_final_info(update: Update, context: ContextTypes.DEFAULT_TYPE)
         try:
             if update.message.photo:
                 summary = (
-                    f"🔔 NOV LEAD!\n\n"
+                    f"🔔 Novi član!\n\n"
                     f"👤 Ime: {full_name}\n"
                     f"📧 Email: {email}\n"
                     f"🏦 Broker: {broker}\n"
@@ -340,7 +340,7 @@ async def collect_final_info(update: Update, context: ContextTypes.DEFAULT_TYPE)
             else:
                 final_info = update.message.text
                 summary = (
-                    f"🔔 NOV LEAD!\n\n"
+                    f"🔔 Novi član!\n\n"
                     f"👤 Ime: {full_name}\n"
                     f"📧 Email registracije: {email}\n"
                     f"🏦 Broker: {broker}\n"
