@@ -1,0 +1,425 @@
+import asyncio
+import logging
+import os
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    ConversationHandler,
+    ContextTypes,
+    PicklePersistence,
+    filters,
+)
+
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+)
+logger = logging.getLogger(__name__)
+
+# Conversation states
+(
+    COLLECTING_NAME,
+    COLLECTING_EMAIL,
+    SHOWING_BENEFITS,
+    BROKER_QUESTION,
+    BROKER_SELECTION,
+    WAITING_GOTOVO,
+    WAITING_FINAL,
+) = range(7)
+
+ADMIN_CHAT_ID = os.environ.get("ADMIN_CHAT_ID")
+
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text(
+        "Dobrodošao.\n\n"
+        "Drago mi je što si ovdje — znači da tražiš nešto više od prosjeka.\n\n"
+        "Da te dodam u zajednicu, trebam par podataka od tebe.\n\n"
+        "Kako se zoveš? Upiši puno ime i prezime."
+    )
+    return COLLECTING_NAME
+
+
+async def collect_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    full_name = update.message.text.strip()
+    first_name = full_name.split()[0]
+    context.user_data["full_name"] = full_name
+    context.user_data["first_name"] = first_name
+
+    await update.message.reply_text(
+        f"Super, {first_name}.\n\n"
+        "Sad mi treba još jedna stvar — tvoja email adresa.\n\n"
+        "Upiši je ispod."
+    )
+    return COLLECTING_EMAIL
+
+
+async def collect_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    email = update.message.text.strip()
+    context.user_data["email"] = email
+    first_name = context.user_data.get("first_name", "")
+
+    await update.message.reply_text(
+        f"Hvala, {first_name}.\n\n"
+        "Evo što te čeka u zajednici."
+    )
+
+    await asyncio.sleep(1.5)
+
+    await update.message.reply_text(
+        "Što dobiješ:\n\n"
+        "— 8 do 12 visokokvalitetnih trade ideja svaki dan\n"
+        "— 85% uspješnost na zlatu, tjedan za tjednom\n"
+        "— Kompletna step-by-step edukacija — od nule do prvog trade-a\n"
+        "— Tjedni mindset i edukacijski pozivi\n"
+        "— 6 do 8 live trading sesija tjedno\n"
+        "— Provjereni broker koji štiti tvoj kapital"
+    )
+
+    await asyncio.sleep(1.5)
+
+    keyboard = [
+        [
+            InlineKeyboardButton("Idući korak →", callback_data="next_step"),
+            InlineKeyboardButton("Zašto je besplatno?", callback_data="why_free"),
+        ]
+    ]
+
+    await update.message.reply_text(
+        "I najvažniji dio:\n\n"
+        "— Nema nikakvih troškova da kreneš\n"
+        "— Nema nikakvih mjesečnih pretplata\n"
+        "— Nema nikakvih ugovora, ikad\n\n"
+        "Ti si u punoj kontroli nad svojim kapitalom. Uvijek.",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+    return SHOWING_BENEFITS
+
+
+async def why_free(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+    first_name = context.user_data.get("first_name", "")
+
+    await query.message.reply_text(
+        f"Odlično pitanje, {first_name}.\n\n"
+        "Razumijem zašto pitaš — svaki put kad je nešto besplatno, normalno je upitati gdje je kvaka.\n\n"
+        "Nema kvake. Objasnim ti odmah."
+    )
+
+    await asyncio.sleep(2)
+
+    await query.message.reply_text(
+        "Radimo s brokerima godinama.\n\n"
+        "Izgradili smo provjeren odnos — oni znaju tko smo i što radimo.\n\n"
+        "Dogovor je jednostavan: oni pokrivaju trošak tvog članstva. "
+        "Ti trejdaš preko njih, oni nas sponzoriraju na osnovu toga."
+    )
+
+    await asyncio.sleep(2)
+
+    await query.message.reply_text(
+        "Znači ti dobiješ sve — trade ideje svaki dan, live sesije, "
+        "tjedne treninge, edukaciju, pozive, kompletan support..."
+    )
+
+    await asyncio.sleep(1.5)
+
+    keyboard = [[InlineKeyboardButton("Spreman sam →", callback_data="ready")]]
+
+    await query.message.reply_text(
+        "...i to bez ijednog eura iz džepa.\n\n"
+        "Win-win. Ali fokus nije na modelu — fokus je da ti profitiraš.",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+    return SHOWING_BENEFITS
+
+
+async def ask_broker_question(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+
+    keyboard = [
+        [
+            InlineKeyboardButton("Da, imam ✅", callback_data="has_broker"),
+            InlineKeyboardButton("Ne, nov sam u ovome", callback_data="no_broker"),
+        ]
+    ]
+
+    await query.message.reply_text(
+        "Odlično.\n\n"
+        "Brzo pitanje prije nego krenemo — imaš li već otvoren račun "
+        "na Vantageu, VT Marketsu ili TradeQu?\n\n"
+        "Ako nemaš, provest ćemo te korak po korak kroz cijeli proces.",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+    return BROKER_QUESTION
+
+
+async def has_broker(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+    first_name = context.user_data.get("first_name", "")
+
+    keyboard = [
+        [
+            InlineKeyboardButton("TradeQ", callback_data="broker_tradequo"),
+            InlineKeyboardButton("Vantage", callback_data="broker_vantage"),
+            InlineKeyboardButton("VT Market", callback_data="broker_vtmarket"),
+        ]
+    ]
+
+    await query.message.reply_text(
+        f"Dobro, {first_name}.\n\n"
+        "Da bi mogao primati trade ideje i ulaziti na live sesije, "
+        "moraš biti registriran ispod naše mreže.\n\n"
+        "Na kojemu od ova tri brokera si registriran?",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+    return BROKER_SELECTION
+
+
+async def broker_tradequo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+    context.user_data["broker"] = "TradeQ"
+
+    keyboard = [[InlineKeyboardButton("Gotovo ✅", callback_data="gotovo_existing")]]
+
+    await query.message.reply_text(
+        "Evo kako da se prebaciš ispod naše mreže.\n\n"
+        "📧 Pošalji ovaj email na: support@tradequo.com\n\n"
+        "<code>Hey can you put me under the structure of luksuz25@gmail.com "
+        "we started working together and I want to work with him.</code>\n\n"
+        "Jednom kada pošalješ email, stisni Gotovo.",
+        parse_mode="HTML",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+    return WAITING_GOTOVO
+
+
+async def broker_vantage(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+    context.user_data["broker"] = "Vantage"
+
+    keyboard = [[InlineKeyboardButton("Gotovo ✅", callback_data="gotovo_existing")]]
+
+    await query.message.reply_text(
+        "Evo kako da se prebaciš ispod naše mreže.\n\n"
+        "📧 Pošalji ovaj email na: support@vantagemarkets.com\n\n"
+        "<code>Please transfer me under Alar Toom management and under IB: 24008323</code>\n\n"
+        "Jednom kada pošalješ email, stisni Gotovo.",
+        parse_mode="HTML",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+    return WAITING_GOTOVO
+
+
+async def broker_vtmarket(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+    context.user_data["broker"] = "VT Market"
+
+    keyboard = [[InlineKeyboardButton("Gotovo ✅", callback_data="gotovo_existing")]]
+
+    await query.message.reply_text(
+        "Evo kako da se prebaciš ispod naše mreže.\n\n"
+        "📧 Pošalji ovaj email na: info@vtmarkets.com\n\n"
+        "<code>Please move my account under IB rebate acc 22208322. "
+        "We started working together and I wish to be on this management.</code>\n\n"
+        "Jednom kada pošalješ email, stisni Gotovo.",
+        parse_mode="HTML",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+    return WAITING_GOTOVO
+
+
+async def gotovo_existing(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+
+    await query.message.reply_text(
+        "Odlično, drago nam je što si prošao kroz cijeli proces! 🎉\n\n"
+        "Molim te pošalji nam još jednom email adresu s kojom si registriran na brokera — "
+        "javimo ti se u roku nekoliko minuta sa svim daljnjim koracima."
+    )
+
+    return WAITING_FINAL
+
+
+async def no_broker(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+    context.user_data["broker"] = "Novi korisnik - registracija"
+
+    keyboard = [[InlineKeyboardButton("Gotovo ✅", callback_data="gotovo_new")]]
+
+    registration_text = (
+        "Nema problema — upravo si na pravom mjestu.\n\n"
+        "Pročitaj sve upute ispod i slijedi korake.\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━━\n"
+        "PROČITAJ SVE PRIJE STARTA!!!\n"
+        "DOBRODOŠLI U USPON ELITE! 📈\n\n"
+        "Do pristupa vas dijele samo 3 jednostavna koraka.\n\n"
+        "📊 Scalp grupa — 5-15 trade ideja dnevno\n"
+        "📈 Intraday grupa — 5-10 trade ideja, Risk:Reward 1:1\n"
+        "🚀 Swing grupa — 1-4 trade ideje, Risk:Reward 1:3\n\n"
+        "1️⃣ Registracija trading računa\n"
+        "Registriraj se putem našeg brokerskog partnera:\n"
+        "🔗 https://vtm.pro/la1-com/en/sEwAM2iW\n"
+        "Referral Code: sEwAM2iW\n\n"
+        "2️⃣ Uspon Elite Onboarding\n"
+        "Otvori onboarding sustav gdje ćeš naći sve detalje:\n"
+        "🔗 https://elite-onboarding-guide.lovable.app\n\n"
+        "✅ Kako registrirati račun\n"
+        "✅ Kako otvoriti Live račun\n"
+        "✅ Kako ostvariti 100% bonus na prvi depozit\n"
+        "✅ Sve potrebne upute za jednostavan početak\n\n"
+        "3️⃣ Aktivacija pristupa\n"
+        "Kada završiš registraciju i napraviš prvi depozit, "
+        "pošalji screenshot potvrde ovdje.\n"
+        "Nakon toga šaljem ti pristup svim trading grupama. 🎉\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "Jednom kada završiš sve korake, stisni Gotovo. 👇"
+    )
+
+    await query.message.reply_text(
+        registration_text,
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+    return WAITING_GOTOVO
+
+
+async def gotovo_new(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+
+    await query.message.reply_text(
+        "Odlično! 🎉\n\n"
+        "Pošalji nam screenshot potvrde depozita ovdje — "
+        "aktiviramo ti pristup u roku nekoliko minuta."
+    )
+
+    return WAITING_FINAL
+
+
+async def collect_final_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    first_name = context.user_data.get("first_name", "")
+    full_name = context.user_data.get("full_name", "N/A")
+    email = context.user_data.get("email", "N/A")
+    broker = context.user_data.get("broker", "N/A")
+
+    if ADMIN_CHAT_ID:
+        try:
+            if update.message.photo:
+                summary = (
+                    f"🔔 NOV LEAD!\n\n"
+                    f"👤 Ime: {full_name}\n"
+                    f"📧 Email: {email}\n"
+                    f"🏦 Broker: {broker}\n"
+                    f"📎 Screenshot depozita poslan ispod."
+                )
+                await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=summary)
+                await context.bot.forward_message(
+                    chat_id=ADMIN_CHAT_ID,
+                    from_chat_id=update.effective_chat.id,
+                    message_id=update.message.message_id,
+                )
+            else:
+                final_info = update.message.text
+                summary = (
+                    f"🔔 NOV LEAD!\n\n"
+                    f"👤 Ime: {full_name}\n"
+                    f"📧 Email registracije: {email}\n"
+                    f"🏦 Broker: {broker}\n"
+                    f"📝 Broker email poslan: {final_info}"
+                )
+                await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=summary)
+        except Exception as e:
+            logger.error(f"Admin notifikacija nije uspjela: {e}")
+
+    await update.message.reply_text(
+        f"Primljeno, {first_name}! ✅\n\n"
+        "Javljamo ti se uskoro. 🚀"
+    )
+
+    return ConversationHandler.END
+
+
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text(
+        "Razgovor je prekinut. Stisni /start kada budeš spreman."
+    )
+    return ConversationHandler.END
+
+
+def main():
+    token = os.environ.get("BOT_TOKEN")
+    if not token:
+        raise ValueError("BOT_TOKEN environment variable nije postavljen!")
+
+    persistence = PicklePersistence(filepath="bot_data.pkl")
+
+    application = (
+        Application.builder()
+        .token(token)
+        .persistence(persistence)
+        .build()
+    )
+
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("start", start)],
+        states={
+            COLLECTING_NAME: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, collect_name)
+            ],
+            COLLECTING_EMAIL: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, collect_email)
+            ],
+            SHOWING_BENEFITS: [
+                CallbackQueryHandler(why_free, pattern="^why_free$"),
+                CallbackQueryHandler(ask_broker_question, pattern="^(next_step|ready)$"),
+            ],
+            BROKER_QUESTION: [
+                CallbackQueryHandler(has_broker, pattern="^has_broker$"),
+                CallbackQueryHandler(no_broker, pattern="^no_broker$"),
+            ],
+            BROKER_SELECTION: [
+                CallbackQueryHandler(broker_tradequo, pattern="^broker_tradequo$"),
+                CallbackQueryHandler(broker_vantage, pattern="^broker_vantage$"),
+                CallbackQueryHandler(broker_vtmarket, pattern="^broker_vtmarket$"),
+            ],
+            WAITING_GOTOVO: [
+                CallbackQueryHandler(gotovo_existing, pattern="^gotovo_existing$"),
+                CallbackQueryHandler(gotovo_new, pattern="^gotovo_new$"),
+            ],
+            WAITING_FINAL: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, collect_final_info),
+                MessageHandler(filters.PHOTO, collect_final_info),
+            ],
+        },
+        fallbacks=[CommandHandler("cancel", cancel)],
+        persistent=True,
+        name="registration_conv",
+    )
+
+    application.add_handler(conv_handler)
+
+    logger.info("Uspon Elite bot je pokrenut...")
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+
+if __name__ == "__main__":
+    main()
