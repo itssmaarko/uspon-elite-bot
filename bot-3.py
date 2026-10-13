@@ -36,27 +36,27 @@ FOLLOW_UP_TIMES = [30 * 60, 3 * 3600, 6 * 3600, 24 * 3600]
 FOLLOW_UP_MESSAGES = {
     "instructions": [
         "Hej {name}! 👋\n\nJesi li uspio poslati email brokeru? Ako trebaš pomoć s bilo čim, tu sam.",
-        "Hej {name}, samo da provjerim — ide li sve ok? Jednom kad pošalješ email, stisni Gotovo i ulaz je tvoj.",
-        "{name}, primjećujem da još nisi završio. Ako se zaglaviš negdje, javi mi se odmah. 💬",
-        "Zadnji podsjetnik, {name} — čim pošalješ email brokeru i stisneš Gotovo, odmah te dodajem. 🚀",
+        "Hej {name}, samo da provjerim ide li sve ok? Jednom kad pošalješ email, stisni Gotovo i ulaz je tvoj.",
+        "{name}, primjećujem da još nisi završio. Ako staneš negdje negdje, javi mi se odmah. 💬",
+        "Zadnji podsjetnik, {name} čim pošalješ email brokeru i stisneš Gotovo, odmah te dodajem. 🚀",
     ],
     "registration": [
         "Hej {name}! 👋\n\nJesi li uspio napraviti registraciju? Javi mi se ako trebaš pomoć s bilo kojim korakom.",
-        "Hej {name}, samo da provjerim — ide li registracija ok? Jednom kad odradiš depozit, pošalji screenshot i ulaz je tvoj!",
-        "{name}, primjećujem da još nisi poslao potvrdu. Ako se zaglaviš negdje, tu sam! 💬",
-        "Zadnji podsjetnik, {name} — tri koraka i community je tvoj. Jednom kad napraviš depozit, samo pošalji screenshot ovdje. 🚀",
+        "Hej {name}, samo da provjerim ide li registracija oke? Jednom kad odradiš depozit, pošalji screenshot i ulaz je tvoj!",
+        "{name}, primjećujem da još nisi poslao potvrdu. Ako staneš negdje, tu sam! 💬",
+        "Zadnji podsjetnik, {name} tri koraka i community je tvoj. Jednom kad napraviš depozit, samo pošalji screenshot ovdje. 🚀",
     ],
     "waiting_email": [
         "Hej {name}! 👋\n\nJoš samo da nam pošalješ email adresu s kojom si registriran na brokera i odmah te dodajemo.",
-        "{name}, samo podsjetnik — pošalji nam email adresu s brokera i ulaz u community je tvoj. 🎯",
+        "{name}, samo podsjetnik pošalji nam email adresu s brokera i ulaz u community je tvoj. 🎯",
         "{name}, još uvijek čekamo tvoj email. Javi se ako ima kakvih problema. 💬",
-        "Zadnji podsjetnik, {name} — pošalji email adresu s brokera i odmah te dodajemo u sve grupe. 🚀",
+        "Zadnji podsjetnik, {name} pošalji email adresu s brokera i odmah te dodajemo u sve grupe. 🚀",
     ],
     "waiting_screenshot": [
         "Hej {name}! 👋\n\nJoš samo screenshot potvrde depozita i odmah ti aktiviramo pristup svim grupama.",
-        "{name}, samo podsjetnik — jednom kad nam pošalješ screenshot, ulaz u community je tvoj. 🎯",
+        "{name}, samo podsjetnik jednom kad nam pošalješ screenshot, ulaz u community je tvoj. 🎯",
         "{name}, još uvijek čekamo potvrdu depozita. Javi se ako ima kakvih problema. 💬",
-        "Zadnji podsjetnik, {name} — pošalji screenshot depozita i odmah te dodajemo u sve grupe. 🚀",
+        "Zadnji podsjetnik, {name} pošalji screenshot depozita i odmah te dodajemo u sve grupe. 🚀",
     ],
 }
 
@@ -136,7 +136,7 @@ async def collect_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         "Što dobiješ:\n\n"
         "✅ 8 do 12 visokokvalitetnih trade ideja svaki dan\n"
         "✅ 85% uspješnost na zlatu, tjedan za tjednom\n"
-        "✅ Kompletan step-by-step edukacija — od nule do prvog trade-a\n"
+        "✅ Kompletan step-by-step edukacija od nule do prvog trade-a\n"
         "✅ Tjedni mindset i edukacijski pozivi\n"
         "✅ 6 do 8 live trading sesija tjedno\n"
         "✅ Provjereni broker koji štiti tvoj kapital"
