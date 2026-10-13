@@ -36,9 +36,9 @@ ADMIN_CHAT_ID = os.environ.get("ADMIN_CHAT_ID")
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await update.message.reply_text(
         "Dobrodošao.\n\n"
-        "Drago mi je što si ovdje — znači da tražiš nešto više od prosjeka.\n\n"
-        "Da te dodam u zajednicu, trebam par podataka od tebe.\n\n"
-        "Kako se zoveš? Upiši puno ime i prezime."
+        "Drago mi je što si ovdje znači da tražiš nešto više od prosjeka.\n\n"
+        "Da dobiješ pristup našem community, želim da se malo bolje upoznamo.\n\n"
+        "Zanima me kako se zoveš i odakle nam dolaziš."
     )
     return COLLECTING_NAME
 
@@ -50,9 +50,9 @@ async def collect_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     context.user_data["first_name"] = first_name
 
     await update.message.reply_text(
-        f"Super, {first_name}.\n\n"
-        "Sad mi treba još jedna stvar — tvoja email adresa.\n\n"
-        "Upiši je ispod."
+        f"Super drago mi je, {first_name}.\n\n"
+        "Sad mi treba još samo jedna stvar prije nego krenemo dalje .\n\n"
+        "Upiši molim te svoju e-mail adressu."
     )
     return COLLECTING_EMAIL
 
@@ -64,19 +64,19 @@ async def collect_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 
     await update.message.reply_text(
         f"Hvala, {first_name}.\n\n"
-        "Evo što te čeka u zajednici."
+        "Evo što sve dobiješ unutar našeg communitya."
     )
 
     await asyncio.sleep(1.5)
 
     await update.message.reply_text(
         "Što dobiješ:\n\n"
-        "— 8 do 12 visokokvalitetnih trade ideja svaki dan\n"
-        "— 85% uspješnost na zlatu, tjedan za tjednom\n"
-        "— Kompletna step-by-step edukacija — od nule do prvog trade-a\n"
-        "— Tjedni mindset i edukacijski pozivi\n"
-        "— 6 do 8 live trading sesija tjedno\n"
-        "— Provjereni broker koji štiti tvoj kapital"
+        "✅ 8 do 12 visokokvalitetnih trade ideja svaki dan\n"
+        "✅ 85% uspješnost na zlatu, tjedan za tjednom\n"
+        "✅ Kompletan step-by-step edukacija — od nule do prvog trade-a\n"
+        "✅Tjedni  mindset i edukacijski pozivi\n"
+        "✅6 do 8 live trading sesija tjedno\n"
+        "✅ Provjereni broker koji štiti tvoj kapital"
     )
 
     await asyncio.sleep(1.5)
@@ -90,9 +90,9 @@ async def collect_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 
     await update.message.reply_text(
         "I najvažniji dio:\n\n"
-        "— Nema nikakvih troškova da kreneš\n"
-        "— Nema nikakvih mjesečnih pretplata\n"
-        "— Nema nikakvih ugovora, ikad\n\n"
+        "🚀 Nema nikakvih troškova da kreneš\n"
+        "🚀 Nema nikakvih mjesečnih pretplata\n"
+        "🚀 Nema nikakvih ugovora, ikad\n\n"
         "Ti si u punoj kontroli nad svojim kapitalom. Uvijek.",
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
@@ -107,23 +107,23 @@ async def why_free(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     await query.message.reply_text(
         f"Odlično pitanje, {first_name}.\n\n"
-        "Razumijem zašto pitaš — svaki put kad je nešto besplatno, normalno je upitati gdje je kvaka.\n\n"
-        "Nema kvake. Objasnim ti odmah."
+        "Razumijem zašto pitaš svaki put kad je nešto besplatno, normalno je upitati gdje je kvaka.\n\n"
+        "Zapravo i nije toliko komplicirano."
     )
 
     await asyncio.sleep(2)
 
     await query.message.reply_text(
         "Radimo s brokerima godinama.\n\n"
-        "Izgradili smo provjeren odnos — oni znaju tko smo i što radimo.\n\n"
-        "Dogovor je jednostavan: oni pokrivaju trošak tvog članstva. "
+        "Izgradili smo provjeren odnos sa njima i oni znaju tko smo i što radimo.\n\n"
+        "Odogovor je jednostavan: oni pokrivaju trošak tvog članstva. "
         "Ti trejdaš preko njih, oni nas sponzoriraju na osnovu toga."
     )
 
     await asyncio.sleep(2)
 
     await query.message.reply_text(
-        "Znači ti dobiješ sve — trade ideje svaki dan, live sesije, "
+        "Znači ti dobiješ sve trade ideje svaki dan, live sesije, "
         "tjedne treninge, edukaciju, pozive, kompletan support..."
     )
 
@@ -132,8 +132,8 @@ async def why_free(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     keyboard = [[InlineKeyboardButton("Spreman sam →", callback_data="ready")]]
 
     await query.message.reply_text(
-        "...i to bez ijednog eura iz džepa.\n\n"
-        "Win-win. Ali fokus nije na modelu — fokus je da ti profitiraš.",
+        "...i to bez ijednog eura što moraš platit.\n\n"
+        "Win-win situacija. Ali fokus nije na modelu fokus je da ti profitiraš.",
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
 
@@ -153,8 +153,8 @@ async def ask_broker_question(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     await query.message.reply_text(
         "Odlično.\n\n"
-        "Brzo pitanje prije nego krenemo — imaš li već otvoren račun "
-        "na Vantageu, VT Marketsu ili TradeQu?\n\n"
+        "Brzo pitanje prije nego krenemo imaš li već otvoren račun "
+        "na Vantageu, VT Marketsu ili TradeQuo?\n\n"
         "Ako nemaš, provest ćemo te korak po korak kroz cijeli proces.",
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
@@ -178,7 +178,7 @@ async def has_broker(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await query.message.reply_text(
         f"Dobro, {first_name}.\n\n"
         "Da bi mogao primati trade ideje i ulaziti na live sesije, "
-        "moraš biti registriran ispod naše mreže.\n\n"
+        "moraš biti registriran ispod nas.\n\n"
         "Na kojemu od ova tri brokera si registriran?",
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
@@ -194,7 +194,7 @@ async def broker_tradequo(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     keyboard = [[InlineKeyboardButton("Gotovo ✅", callback_data="gotovo_existing")]]
 
     await query.message.reply_text(
-        "Evo kako da se prebaciš ispod naše mreže.\n\n"
+        "Evo kako da se prebaciš ispod nas.\n\n"
         "📧 Pošalji ovaj email na: support@tradequo.com\n\n"
         "<code>Hey can you put me under the structure of luksuz25@gmail.com "
         "we started working together and I want to work with him.</code>\n\n"
@@ -214,7 +214,7 @@ async def broker_vantage(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     keyboard = [[InlineKeyboardButton("Gotovo ✅", callback_data="gotovo_existing")]]
 
     await query.message.reply_text(
-        "Evo kako da se prebaciš ispod naše mreže.\n\n"
+        "Evo kako da se prebaciš ispod nas.\n\n"
         "📧 Pošalji ovaj email na: support@vantagemarkets.com\n\n"
         "<code>Please transfer me under Alar Toom management and under IB: 24008323</code>\n\n"
         "Jednom kada pošalješ email, stisni Gotovo.",
@@ -233,7 +233,7 @@ async def broker_vtmarket(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     keyboard = [[InlineKeyboardButton("Gotovo ✅", callback_data="gotovo_existing")]]
 
     await query.message.reply_text(
-        "Evo kako da se prebaciš ispod naše mreže.\n\n"
+        "Evo kako da se prebaciš ispod nas.\n\n"
         "📧 Pošalji ovaj email na: info@vtmarkets.com\n\n"
         "<code>Please move my account under IB rebate acc 22208322. "
         "We started working together and I wish to be on this management.</code>\n\n"
@@ -251,7 +251,7 @@ async def gotovo_existing(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     await query.message.reply_text(
         "Odlično, drago nam je što si prošao kroz cijeli proces! 🎉\n\n"
-        "Molim te pošalji nam još jednom email adresu s kojom si registriran na brokera — "
+        "Molim te pošalji nam još jednom email adresu s kojom si registriran na brokera "
         "javimo ti se u roku nekoliko minuta sa svim daljnjim koracima."
     )
 
@@ -266,10 +266,10 @@ async def no_broker(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     keyboard = [[InlineKeyboardButton("Gotovo ✅", callback_data="gotovo_new")]]
 
     registration_text = (
-        "Nema problema — upravo si na pravom mjestu.\n\n"
+        "Nema problema upravo si na pravom mjestu.\n\n"
         "Pročitaj sve upute ispod i slijedi korake.\n\n"
-        "━━━━━━━━━━━━━━━━━━━━━━\n"
-        "PROČITAJ SVE PRIJE STARTA!!!\n"
+        
+        
         "DOBRODOŠLI U USPON ELITE! 📈\n\n"
         "Do pristupa vas dijele samo 3 jednostavna koraka.\n\n"
         "📊 Scalp grupa — 5-15 trade ideja dnevno\n"
@@ -290,7 +290,7 @@ async def no_broker(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         "Kada završiš registraciju i napraviš prvi depozit, "
         "pošalji screenshot potvrde ovdje.\n"
         "Nakon toga šaljem ti pristup svim trading grupama. 🎉\n\n"
-        "━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        
         "Jednom kada završiš sve korake, stisni Gotovo. 👇"
     )
 
@@ -308,7 +308,7 @@ async def gotovo_new(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     await query.message.reply_text(
         "Odlično! 🎉\n\n"
-        "Pošalji nam screenshot potvrde depozita ovdje — "
+        "Pošalji nam screenshot potvrde depozita ovdje "
         "aktiviramo ti pristup u roku nekoliko minuta."
     )
 
